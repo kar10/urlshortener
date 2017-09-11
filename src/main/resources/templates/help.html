@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Help page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<p>Prilikom testiranja korišten je program </p><a href="https://www.getpostman.com/">Postman</a>
+
+	<h4>1. Otvaranje accounta</h4>
+    <pre>
+    	Post metoda: http://localhost:8080/account
+    	Auth: No Auth
+    	Definirati Header: Content-Type = application/json
+    		
+    	Body:
+    	{
+			"accountId" : "marko"
+		}
+		Result: {"success":true,"description":"Your account(marko) is opened.","password":"qqRvmWvG"}
+	
+		Ako se akcija ponovi, kao rezultat će se dobiti: {"success":false,"description":"Account with this ID already exists."}
+	
+		Potrebno je definirati barem još jednog korisnika, npr:
+		Body:
+		{
+			"accountId" : "marko"
+		}
+		Result: {"success":true,"description":"Your account(ivan) is opened.","password":"hyYIJoS3"}
+	</pre>
+	
+	<h4>2. Registriranje URLova</h4>
+    <pre>
+    	Post metoda: http://localhost:8080/register
+    	Auth: Basic Auth (unijeti gornje generirane vrijednosti za account "marko")
+    	Definirati Header: Content-Type = application/json
+    		
+    	Body:
+		{
+			"url" : "http://www.facebook.com"
+
+		}
+		Result: {"shortUrl":"http://localhost:8080/349516933"}
+	
+		Body:
+		{	
+			"url" : "http://www.youtube.com"
+		}
+		Result: {"shortUrl":"http://localhost:8080/338101972"}
+	
+		Ako se još jednom ponovi akcija, završava http statusom 409 (conflict).
+	
+		Definirati još jedan url koristeći drugi account:
+		Auth: Basic Auth (unijeti gornje generirane vrijednosti za account "ivan")
+    		
+    	Body:
+		{	
+			"url" : "http://www.radio101.hr"
+		}
+		Result: {"shortUrl":"http://localhost:8080/1027832609"}
+	
+		Ako account "ivan" pokuša unijeti "http://www.youtube.com" također će završiti s http statusom 409 (conflict).
+	</pre>
+	
+	<h4>2.1. Otvaranje kreiranih URLova</h4>
+	<pre>
+		Svaki URL ima generirani skraćeni URL koji ima ugrađen brojač (counter).
+		Ukoliko se pokuša otvoriti stranica preko generiranog skraćenog URLa dogodit će se redirekcija
+		na pravu stranicu te će se njezin counter inkrementirati za jedan.
+	</pre>
+	
+	<h4>3. Ispis statistike posjećenosti URLova</h4>
+    <pre>
+    	Rezultati se ispisuju prema korisniku.
+    
+    	Get metoda: http://localhost:8080/statistic/{accountId}
+    	Auth: Basic Auth (unijeti gornje generirane vrijednosti za account "marko")
+		
+	
+		Npr. http://localhost:8080/statistic/marko
+		Result: 
+		{
+  			"http://www.facebook.hr" : 2,
+  			"http://www.youtube.com" : 1
+		}
+	
+		Npr. http://localhost:8080/statistic/ivan
+		Result: 
+		{
+  			"http://www.radio101.hr" : 3
+		}
+	
+		Mapa ispisuje broj klikova stranica prema definiranom korisniku (accountId).
+	</pre>
+</body>
+</html>
